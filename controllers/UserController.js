@@ -14,11 +14,40 @@ class UserController {
             event.preventDefault();
 
             // Coletando informações do Formulário
-            console.log(this.getValues());
+            let values = this.getValues();
 
-            // Com as informações do Formulário, podemos adicionar na tabela
-            // this.addLine(user);
+            // Pegar dados da imagem
+            this.getPhoto( (content) => {
+                // Preenchendo os dados do JSON 
+                values.photo = content;
+    
+                // Com as informações do Formulário, podemos adicionar na tabela
+                this.addLine(values);
+
+            });
+
+
         });
+    }
+
+    getPhoto(callback){
+        let fileReader = new FileReader();
+
+        let elementsPhoto = [...this.formEl.elements].filter((item) => {
+            if(item.name === 'photo'){
+                return item;
+            }
+        });
+
+        let file = elementsPhoto[0].files[0]
+
+        fileReader.onload = () => {
+            callback(fileReader.result);
+        }
+
+        // Inserindo os dados da imagem
+        fileReader.readAsDataURL(file);
+
     }
 
     // Pegando valores do formulario
@@ -55,7 +84,7 @@ class UserController {
     
         tr.innerHTML = `
             <td>
-                <img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm"/>
+                <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"/>
             </td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
@@ -71,7 +100,7 @@ class UserController {
             </td>
         `;
     
-        this.tbodyId.appendChild(tr);
+        this.tableBody.appendChild(tr);
         // document.querySelector('#table-users')
     }
 
