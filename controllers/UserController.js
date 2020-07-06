@@ -60,7 +60,11 @@ class UserController {
             }
 
             // Inserindo os dados da imagem
-            fileReader.readAsDataURL(file);
+            if(file){
+                fileReader.readAsDataURL(file);
+            } else {
+                resolve('/dist/img/avatar.png');
+            }
 
         });
 
@@ -77,7 +81,10 @@ class UserController {
         [...this.formEl.elements].forEach( (field) => {
             if(field.name == 'gender' && field.checked) {
                 user[field.name] = field.value
-            } else {
+            } else if(field.name == 'admin') {
+                user[field.name] = field.checked
+            } 
+            else {
                 user[field.name] = field.value
             }
         });
@@ -107,7 +114,7 @@ class UserController {
             </td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin}</td>
+            <td>${ ( dataUser.admin ) ? ` Sim` : `Não` }</td>
             <td>02/04/2018</td>
             <td>
             <button type="button" class="btn btn-primary btn-xs btn-flat" >
