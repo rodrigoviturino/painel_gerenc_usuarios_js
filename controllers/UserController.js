@@ -16,37 +16,56 @@ class UserController {
             // Coletando informações do Formulário
             let values = this.getValues();
 
-            // Pegar dados da imagem
-            this.getPhoto( (content) => {
+            this.getPhoto()
+            // CONTENT é o resultado do -> resolve(fileReader.result);
+            .then((content) => {
                 // Preenchendo os dados do JSON 
                 values.photo = content;
-    
+                    
                 // Com as informações do Formulário, podemos adicionar na tabela
                 this.addLine(values);
-
-            });
-
-
+            }, 
+            (e) => {
+                console.error(e);
+            }   
+            );
         });
     }
 
-    getPhoto(callback){
-        let fileReader = new FileReader();
+    getPhoto(){
 
-        let elementsPhoto = [...this.formEl.elements].filter((item) => {
-            if(item.name === 'photo'){
-                return item;
+        const prom = new Promise( (resolve, reject ) => {
+
+            // Instanciando Objeto que lida com arquivos de Requisição
+            let fileReader = new FileReader();
+
+            // Selecionando todos itens do formulario e filtrando o item JSON que tenha valor NAME PHOTO
+            let elementsPhoto = [...this.formEl.elements].filter( (item) => {
+                if(item.name === 'photo'){
+                    return item;
+                }
+            });
+            
+            // pegando valor da imagem, para converter em url
+            let file = elementsPhoto[0].files[0];
+
+            // Se a Promessa Resolver
+            fileReader.onload = () => {
+                resolve(fileReader.result);
             }
+
+            // Se a Promessa der Error
+            fileReader.onerror = (error) => {
+                reject(error)
+            }
+
+            // Inserindo os dados da imagem
+            fileReader.readAsDataURL(file);
+
         });
 
-        let file = elementsPhoto[0].files[0]
 
-        fileReader.onload = () => {
-            callback(fileReader.result);
-        }
-
-        // Inserindo os dados da imagem
-        fileReader.readAsDataURL(file);
+        return prom;
 
     }
 
